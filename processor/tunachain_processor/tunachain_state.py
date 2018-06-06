@@ -29,11 +29,11 @@ def _get_address(key):
     return hashlib.sha512(key.encode('utf-8')).hexdigest()[:62]
 
 
-def _get_asset_address(asset_name):
+def _get_poe_address(asset_name):
     return TUNACHAIN_NAMESPACE + '00' + _get_address(asset_name)
 
 
-def _get_transfer_address(asset_name):
+def _get_poa_address(asset_name):
     return TUNACHAIN_NAMESPACE + '01' + _get_address(asset_name)
 
 
@@ -52,49 +52,6 @@ class TunachainState(object):
     def __init__(self, context):
         self._context = context
 
-    def get_asset(self, name):
-        return self._get_state(_get_asset_address(name))
-
-    def get_transfer(self, name):
-        return self._get_state(_get_transfer_address(name))
-
-    def make_poe(self, asset, owner):
-        # generate address
-        address = _get_asset_address(asset.get('hash'))
-        state_data = _serialize(
-            {
-                "hash": asset.get('hash'),
-                "entity": asset.get('entity'),
-                "owner": owner
-            })
-        return self._context.set_state(
-            {address: state_data}, timeout=self.TIMEOUT)
-
-    def set_asset(self, name, owner):
-        address = _get_asset_address(name)
-        state_data = _serialize(
-            {
-                "name": name,
-                "owner": owner
-            })
-        return self._context.set_state(
-            {address: state_data}, timeout=self.TIMEOUT)
-
-    def set_transfer(self, name, owner):
-        address = _get_transfer_address(name)
-        state_data = _serialize(
-            {
-                "asset": name,
-                "owner": owner
-            })
-        return self._context.set_state(
-            {address: state_data}, timeout=self.TIMEOUT)
-
-    def delete_transfer(self, name):
-        return self._context.delete_state(
-            [_get_transfer_address(name)],
-            timeout=self.TIMEOUT)
-
     def _get_state(self, address):
         state_entries = self._context.get_state(
             [address], timeout=self.TIMEOUT)
@@ -103,3 +60,24 @@ class TunachainState(object):
         else:
             entry = None
         return entry
+
+    def get_poe(self, name):
+        return self._get_state(_get_poe_address(name))
+
+    def get_poa(self, name):
+        return self._get_state(_get_poa_address(name))
+
+    def make_poe(self, asset, owner):
+        # generate address
+        address = _get_poe_address(asset.get('hash'))
+        state_data = _serialize(
+            {
+                "id": asset.get('id'),
+                "hash": asset.get('hash'),
+                "entity": asset.get('entity'),
+                "owner": owner
+            })
+        return self._context.set_state(
+            {address: state_data}, timeout=self.TIMEOUT)
+
+

@@ -45,7 +45,6 @@ class TunachainTransactionHandler(TransactionHandler):
         return [TUNACHAIN_NAMESPACE]
 
     def apply(self, transaction, context):
-        raise InvalidTransaction('Test error message')
 
         header = transaction.header
         signer = header.signer_public_key
@@ -55,37 +54,16 @@ class TunachainTransactionHandler(TransactionHandler):
         payload = TunachainPayload(transaction.payload)
         state = TunachainState(context)
 
-        LOGGER.info('Handling transaction: %s > %s %s:: %s',
+        LOGGER.info('Handling transaction: %s > %s :: %s',
                     payload.action,
                     payload.asset,
-                    '> ' + payload.owner[:8] + '... ' if payload.owner else '',
+                    # '> ' + payload.owner[:8] + '... ' if payload.owner else '',
                     signer[:8] + '... ')
 
         if payload.action == 'poe':
             _make_poe(asset=payload.asset,
                       owner=signer,
                       state=state)
-
-        elif payload.action == 'create':
-            _create_asset(asset=payload.asset,
-                          owner=signer,
-                          state=state)
-
-        elif payload.action == 'transfer':
-            _transfer_asset(asset=payload.asset,
-                            owner=payload.owner,
-                            signer=signer,
-                            state=state)
-
-        elif payload.action == 'accept':
-            _accept_transfer(asset=payload.asset,
-                             signer=signer,
-                             state=state)
-
-        elif payload.action == 'reject':
-            _reject_transfer(asset=payload.asset,
-                             signer=signer,
-                             state=state)
 
         else:
             raise InvalidTransaction('Unhandled action: {}'.format(
@@ -94,52 +72,8 @@ class TunachainTransactionHandler(TransactionHandler):
 
 def _make_poe(asset, owner, state):
     LOGGER.info('Hash: %s', asset.get('hash'))
-    if state.get_asset(asset.get('hash')) is not None:
+    if state.get_poe(asset.get('hash')) is not None:
         raise InvalidTransaction(
             'Invalid action: Hash already exists: {}'.format(asset.get('hash')))
 
     state.make_poe(asset, owner)
-
-
-def _create_asset(asset, owner, state):
-    if state.get_asset(asset) is not None:
-        raise InvalidTransaction(
-            'Invalid action: Asset already exists: {}'.format(asset))
-
-    state.set_asset(asset, owner)
-
-
-def _transfer_asset(asset, owner, signer, state):
-    asset_data = state.get_asset(asset)
-    if asset_data is None:
-        raise InvalidTransaction('Asset does not exist')
-
-    if signer != asset_data.get('owner'):
-        raise InvalidTransaction('Only an Asset\'s owner may transfer it')
-
-    state.set_transfer(asset, owner)
-
-
-def _accept_transfer(asset, signer, state):
-    transfer_data = state.get_transfer(asset)
-    if transfer_data is None:
-        raise InvalidTransaction('Asset is not being transfered')
-
-    if signer != transfer_data.get('owner'):
-        raise InvalidTransaction(
-            'Transfers can only be accepted by the new owner')
-
-    state.set_asset(asset, transfer_data.get('owner'))
-    state.delete_transfer(asset)
-
-
-def _reject_transfer(asset, signer, state):
-    transfer_data = state.get_transfer(asset)
-    if transfer_data is None:
-        raise InvalidTransaction('Asset is not being transfered')
-
-    if signer != transfer_data.get('owner'):
-        raise InvalidTransaction(
-            'Transfers can only be rejected by the potential new owner')
-
-    state.delete_transfer(asset)

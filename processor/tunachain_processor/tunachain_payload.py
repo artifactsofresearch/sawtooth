@@ -27,19 +27,20 @@ class TunachainPayload(object):
             raise InvalidTransaction("Invalid payload serialization")
 
         action = data.get('action')
-#        asset_raw = data.get('asset')
         asset = json.loads(data.get('asset'))
-        owner = data.get('owner')
+        # owner = data.get('owner')
 
         if not action:
             raise InvalidTransaction('Action is required')
-        if action not in ('poe', 'create', 'transfer', 'accept', 'reject'):
+
+        if action not in ('poe', 'poa'):
             raise InvalidTransaction('Invalid action: {}'.format(action))
 
         if not asset:
             raise InvalidTransaction('Asset is required')
 
-#        asset = json.loads(asset_raw)
+        if not asset.get('id'):
+            raise InvalidTransaction('Id is required')
 
         if not asset.get('hash'):
             raise InvalidTransaction('Asset hash is required')
@@ -47,14 +48,16 @@ class TunachainPayload(object):
         if not asset.get('entity'):
             raise InvalidTransaction('Entity is required')
 
-        if action == 'transfer':
-            if not owner:
-                raise InvalidTransaction(
-                    'Owner is required for "transfer" transaction')
+        # if not owner:
+        #     raise InvalidTransaction(
+        #         'Owner is required for "POE" transaction')
+
+        if action == 'poa':
+            pass
 
         self._action = action
         self._asset = asset
-        self._owner = owner
+        #self._owner = owner
 
     @property
     def action(self):
@@ -64,6 +67,6 @@ class TunachainPayload(object):
     def asset(self):
         return self._asset
 
-    @property
-    def owner(self):
-        return self._owner
+    # @property
+    # def owner(self):
+    #     return self._owner
