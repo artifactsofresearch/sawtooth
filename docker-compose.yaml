@@ -124,35 +124,33 @@ services:
       - '8800:8800'
     command: |
       bash -c "
-        if [ ! -f ~/.sawtooth/keys/my_key.priv ]; then
-          sawtooth keygen my_key
+        if [ -z $$(ls -A /var/lib/sawtooth) ]; then
+          sawtooth keygen && \
+          sawadm keygen \
+
+          sawset genesis \
+            -k /etc/sawtooth/keys/validator.priv \
+            -o config-genesis.batch && \
+          sawset proposal create \
+            -k /etc/sawtooth/keys/validator.priv \
+            -o config.batch \
+            sawtooth.consensus.algorithm=poet \
+            sawtooth.poet.report_public_key_pem=\"$$(cat /etc/sawtooth/simulator_rk_pub.pem)\" \
+            sawtooth.poet.valid_enclave_measurements=$$(poet enclave measurement) \
+            sawtooth.poet.valid_enclave_basenames=$$(poet enclave basename) \
+
+          poet registration create \
+            -k /etc/sawtooth/keys/validator.priv \
+            -o poet.batch && \
+          sawset proposal create \
+            -k /etc/sawtooth/keys/validator.priv \
+               sawtooth.poet.target_wait_time=5 \
+               sawtooth.poet.initial_wait_time=25 \
+               sawtooth.publisher.max_batches_per_block=100 \
+            -o poet-settings.batch && \
+
+          sawadm genesis config-genesis.batch config.batch poet.batch
         fi;
-        if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
-          sawadm keygen
-        fi;
-
-        sawset genesis \
-          -k /etc/sawtooth/keys/validator.priv \
-          -o config-genesis.batch && \
-        sawset proposal create \
-          -k /etc/sawtooth/keys/validator.priv \
-          -o config.batch \
-          sawtooth.consensus.algorithm=poet \
-          sawtooth.poet.report_public_key_pem=\"$$(cat /etc/sawtooth/simulator_rk_pub.pem)\" \
-          sawtooth.poet.valid_enclave_measurements=$$(poet enclave measurement) \
-          sawtooth.poet.valid_enclave_basenames=$$(poet enclave basename) \
-
-        poet registration create \
-          -k /etc/sawtooth/keys/validator.priv \
-          -o poet.batch && \
-        sawset proposal create \
-          -k /etc/sawtooth/keys/validator.priv \
-             sawtooth.poet.target_wait_time=5 \
-             sawtooth.poet.initial_wait_time=25 \
-             sawtooth.publisher.max_batches_per_block=100 \
-          -o poet-settings.batch && \
-
-        sawadm genesis config-genesis.batch config.batch poet.batch
 
         sawtooth-validator -vv \
           --endpoint tcp://validator:8800 \
