@@ -18,7 +18,7 @@ import json
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
 
 
-class TunachainPayload(object):
+class Payload(object):
 
     def __init__(self, payload):
         try:

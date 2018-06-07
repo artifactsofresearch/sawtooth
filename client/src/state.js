@@ -17,10 +17,10 @@ const {
 const secp256k1 = require('sawtooth-sdk/signing/secp256k1')
 
 // Config variables
-const KEY_NAME = 'transfer-chain.keys'
+const KEY_NAME = 'artifact-chain.keys'
 const API_URL = 'http://localhost:8000/api'
 
-const FAMILY = 'transfer-chain'
+const FAMILY = 'artifact-chain'
 const VERSION = '0.0'
 const PREFIX = '19d832'
 

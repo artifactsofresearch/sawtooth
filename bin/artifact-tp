@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
     'processor'))
 
-from tunachain_processor.main import main
+from artifact_processor.main import main
 
 if __name__ == '__main__':
     main()

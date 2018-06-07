@@ -21,8 +21,8 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-TUNACHAIN_NAMESPACE = hashlib.sha512(
-    'transfer-chain'.encode('utf-8')).hexdigest()[0:6]
+ARTIFACT_NAMESPACE = hashlib.sha512(
+    'artifact-chain'.encode('utf-8')).hexdigest()[0:6]
 
 
 def _get_address(key):
@@ -30,11 +30,11 @@ def _get_address(key):
 
 
 def _get_poe_address(asset_name):
-    return TUNACHAIN_NAMESPACE + '00' + _get_address(asset_name)
+    return ARTIFACT_NAMESPACE + '00' + _get_address(asset_name)
 
 
 def _get_poa_address(asset_name):
-    return TUNACHAIN_NAMESPACE + '01' + _get_address(asset_name)
+    return ARTIFACT_NAMESPACE + '01' + _get_address(asset_name)
 
 
 def _deserialize(data):
@@ -45,7 +45,7 @@ def _serialize(data):
     return json.dumps(data, sort_keys=True).encode('utf-8')
 
 
-class TunachainState(object):
+class State(object):
 
     TIMEOUT = 3
 

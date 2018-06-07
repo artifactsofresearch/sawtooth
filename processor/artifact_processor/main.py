@@ -19,7 +19,7 @@ import sys
 from sawtooth_sdk.processor.core import TransactionProcessor
 from sawtooth_sdk.processor.log import init_console_logging
 
-from tunachain_processor.handler import TunachainTransactionHandler
+from artifact_processor.handler import ArtifactTransactionHandler
 
 
 def parse_args(args):
@@ -50,7 +50,7 @@ def main(args=None):
 
         init_console_logging(verbose_level=opts.verbose)
 
-        handler = TunachainTransactionHandler()
+        handler = ArtifactTransactionHandler()
 
         processor.add_handler(handler)
 

@@ -18,19 +18,19 @@ import logging
 from sawtooth_sdk.processor.handler import TransactionHandler
 from sawtooth_sdk.processor.exceptions import InvalidTransaction
 
-from tunachain_processor.tunachain_payload import TunachainPayload
-from tunachain_processor.tunachain_state import TunachainState
-from tunachain_processor.tunachain_state import TUNACHAIN_NAMESPACE
+from artifact_processor.payload import Payload
+from artifact_processor.state import State
+from artifact_processor.state import ARTIFACT_NAMESPACE
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-class TunachainTransactionHandler(TransactionHandler):
+class ArtifactTransactionHandler(TransactionHandler):
 
     @property
     def family_name(self):
-        return 'transfer-chain'
+        return 'artifact-chain'
 
     @property
     def family_versions(self):
@@ -42,7 +42,7 @@ class TunachainTransactionHandler(TransactionHandler):
 
     @property
     def namespaces(self):
-        return [TUNACHAIN_NAMESPACE]
+        return [ARTIFACT_NAMESPACE]
 
     def apply(self, transaction, context):
 
@@ -51,8 +51,8 @@ class TunachainTransactionHandler(TransactionHandler):
 
         LOGGER.info('transaction.payload: %s', transaction.payload)
 
-        payload = TunachainPayload(transaction.payload)
-        state = TunachainState(context)
+        payload = Payload(transaction.payload)
+        state = State(context)
 
         LOGGER.info('Handling transaction: %s > %s :: %s',
                     payload.action,

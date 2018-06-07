@@ -33,6 +33,6 @@ lint() {
 ret_val=0
 
 export PYTHONPATH=$PYTHONPATH:$TOP_DIR/processor
-lint processor/tunachain_processor || ret_val=1
+lint processor/artifact_processor || ret_val=1
 
 exit $ret_val
