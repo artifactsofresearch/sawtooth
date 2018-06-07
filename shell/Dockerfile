@@ -44,10 +44,10 @@ RUN pip3 install \
     pylint \
     pycodestyle
 
-WORKDIR /project/sawtooth-tuna
+WORKDIR /project/sawtooth-artifact
 
-COPY client/package.json /project/sawtooth-tuna/client/
+COPY client/package.json /project/sawtooth-artifact/client/
 
 RUN cd client/ && npm install
 
-ENV PATH $PATH:/project/sawtooth-tuna/bin
+ENV PATH $PATH:/project/sawtooth-artifact/bin
