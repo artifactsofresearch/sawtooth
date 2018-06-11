@@ -22,7 +22,7 @@ const API_URL = 'http://localhost:8000/api'
 
 const FAMILY = 'artifact-chain'
 const VERSION = '0.0'
-const PREFIX = '19d832'
+const PREFIX = '057f99'
 
 // Fetch key-pairs from localStorage
 const getKeys = () => {

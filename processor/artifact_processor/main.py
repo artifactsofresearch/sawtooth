@@ -46,6 +46,7 @@ def main(args=None):
     opts = parse_args(args)
     processor = None
     try:
+        print(args)
         processor = TransactionProcessor(url=opts.connect)
 
         init_console_logging(verbose_level=opts.verbose)

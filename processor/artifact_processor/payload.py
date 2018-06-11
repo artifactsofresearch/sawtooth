@@ -27,37 +27,40 @@ class Payload(object):
             raise InvalidTransaction("Invalid payload serialization")
 
         action = data.get('action')
-        asset = json.loads(data.get('asset'))
-        # owner = data.get('owner')
+
+        try:
+            asset = json.loads(data.get('asset'))
+        except ValueError:
+            asset = None
 
         if not action:
             raise InvalidTransaction('Action is required')
 
         if action not in ('poe', 'poa'):
-            raise InvalidTransaction('Invalid action: {}'.format(action))
+            raise InvalidTransaction('- Invalid action: {}'.format(action))
 
         if not asset:
-            raise InvalidTransaction('Asset is required')
+            raise InvalidTransaction('- Asset is required and should be a json')
 
-        if not asset.get('id'):
-            raise InvalidTransaction('Id is required')
+        if action == 'poe':
+            if not asset.get('id'):
+                raise InvalidTransaction('- Id is required')
 
-        if not asset.get('hash'):
-            raise InvalidTransaction('Asset hash is required')
+            if not asset.get('hash'):
+                raise InvalidTransaction('- Asset hash is required')
 
-        if not asset.get('entity'):
-            raise InvalidTransaction('Entity is required')
+            if not asset.get('entity'):
+                raise InvalidTransaction('- Entity is required')
 
-        # if not owner:
-        #     raise InvalidTransaction(
-        #         'Owner is required for "POE" transaction')
+        elif action == 'poa':
+            if not asset.get('citing_id'):
+                raise InvalidTransaction('- citing_id is required')
 
-        if action == 'poa':
-            pass
+            if not asset.get('cited_id'):
+                raise InvalidTransaction('- cited_id is required')
 
         self._action = action
         self._asset = asset
-        #self._owner = owner
 
     @property
     def action(self):
@@ -66,7 +69,3 @@ class Payload(object):
     @property
     def asset(self):
         return self._asset
-
-    # @property
-    # def owner(self):
-    #     return self._owner

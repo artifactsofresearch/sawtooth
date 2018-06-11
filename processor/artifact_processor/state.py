@@ -27,10 +27,28 @@ ARTIFACT_NAMESPACE = hashlib.sha512(
 
 def _get_address(key):
     return hashlib.sha512(key.encode('utf-8')).hexdigest()[:62]
+    # return key.encode('utf-8')[:62]
 
 
-def _get_poe_address(asset_name):
-    return ARTIFACT_NAMESPACE + '00' + _get_address(asset_name)
+def _get_hash_asset(key):
+    return hashlib.sha512(key.encode('utf-8')).hexdigest()[:30]
+
+
+# FOR TESTING PURPOSE
+def _get_hash_file_test(key):
+    return hashlib.sha512(key.encode('utf-8')).hexdigest()[:32]
+
+
+def _get_poe_address_test(file_hash, asset_string):
+    return ARTIFACT_NAMESPACE + '00' + _get_hash_file_test(file_hash) + _get_hash_asset(asset_string)
+
+
+# def _get_poe_address_file(file_hash):
+#     return ARTIFACT_NAMESPACE + '00' + _get_hash_file(file_hash)
+# ----------- finish testing fuctions
+
+def _get_poe_address(file_hash):
+    return ARTIFACT_NAMESPACE + '00' + _get_address(file_hash)
 
 
 def _get_poa_address(asset_name):
@@ -55,29 +73,55 @@ class State(object):
     def _get_state(self, address):
         state_entries = self._context.get_state(
             [address], timeout=self.TIMEOUT)
+        LOGGER.info("Found addresses: " + str(state_entries))
         if state_entries:
             entry = _deserialize(data=state_entries[0].data)
         else:
             entry = None
-        return entry
+        self.entry = entry
+        return self.entry
 
-    def get_poe(self, name):
-        return self._get_state(_get_poe_address(name))
+    def get_poe(self, asset):
+        return self._get_state(_get_poe_address(asset.get("hash")))
 
     def get_poa(self, name):
         return self._get_state(_get_poa_address(name))
 
     def make_poe(self, asset, owner):
         # generate address
-        address = _get_poe_address(asset.get('hash'))
+        # testing asset_str = _serialize(asset).decode("utf-8")
+        address = _get_poe_address(asset.get("hash"))
         state_data = _serialize(
             {
-                "id": asset.get('id'),
-                "hash": asset.get('hash'),
-                "entity": asset.get('entity'),
+                "id": asset.get("id"),
+                "hash": asset.get("hash"),
+                "entity": asset.get("entity"),
                 "owner": owner
             })
         return self._context.set_state(
             {address: state_data}, timeout=self.TIMEOUT)
 
+    def make_poa(self, asset, owner):
+        address = _get_poa_address(asset.get("citing_id"))
+        state_data = _serialize({
+            "citing_id": asset.get("citing_id"),
+            "data":
+                [{
+                    "owner": owner,
+                    "cited_id": asset.get("cited_id"),
+                }]
+        }
+        )
+        return self._context.set_state(
+            {address: state_data}, timeout=self.TIMEOUT)
 
+    def update_poa(self, asset, owner):
+        address = _get_poa_address(asset.get("citing_id"))
+        entry_prev = self._get_state(address)
+        save_asset = {
+            "owner": owner,
+            "cited_id": asset.get("cited_id"),
+        }
+        entry_prev["data"].append(save_asset)
+        return self._context.set_state(
+            {address: _serialize(entry_prev)}, timeout=self.TIMEOUT)

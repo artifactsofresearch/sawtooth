@@ -26,7 +26,7 @@ from artifact_processor.state import ARTIFACT_NAMESPACE
 LOGGER = logging.getLogger(__name__)
 
 
-class ArtifactTransactionHandler(TransactionHandler):
+class TransactionHandlerAbstract(TransactionHandler):
 
     @property
     def family_name(self):
@@ -44,45 +44,38 @@ class ArtifactTransactionHandler(TransactionHandler):
     def namespaces(self):
         return [ARTIFACT_NAMESPACE]
 
+    def _transact(asset, owner, state):
+        raise NotImplementedError()
+        # LOGGER.info('Hash: %s', asset.get('hash'))
+        # if state.get_poe(asset.get('hash')) is not None:
+        #     state.update_poe_payload(asset.get('hash'), asset)
+        #     # raise InvalidTransaction(
+        #     #    'Invalid action: Hash already exists: {}'.format(asset.get('hash')))
+        # else:
+        #     state.make_poe(asset, owner)
+
     def apply(self, transaction, context):
 
         header = transaction.header
         signer = header.signer_public_key
 
         LOGGER.info('transaction.payload: %s', transaction.payload)
+        payload_object = None
+        if transaction.payload.get('action') == 'poe':
+            payload_object = Payload(transaction.payload)
+        else:
+            raise InvalidTransaction('Unhandled action: {}'.format(
+                payload_object.action))
 
-        payload = Payload(transaction.payload)
+        payload_object = Payload(transaction.payload)
         state = State(context)
 
         LOGGER.info('Handling transaction: %s > %s :: %s',
-                    payload.action,
-                    payload.asset,
+                    payload_object.action,
+                    payload_object.asset,
                     signer[:8] + '... ')
 
-        if payload.action == 'poe':
-            _make_poe(asset=payload.asset,
-                      owner=signer,
-                      state=state)
-        elif payload.action == 'poa':
-            _make_poa(asset=payload.asset,
-                      owner=signer,
-                      state=state)
-        else:
-            raise InvalidTransaction('- Unhandled action: {}'.format(
-                payload.action))
+        self._transact(payload_object)
 
 
-def _make_poe(asset, owner, state):
-    LOGGER.info('Hash: %s', asset.get('hash'))
-    if state.get_poe(asset) is not None:
-        raise InvalidTransaction(
-            ' - Invalid action: Hash already exists: {}'.format(asset.get('hash')))
-    state.make_poe(asset, owner)
 
-
-def _make_poa(asset, owner, state):
-    LOGGER.info('Citing_id: %s', asset.get('citing_id'))
-    if state.get_poa(asset.get('citing_id')) is not None:
-        state.update_poa(asset, owner)
-    else:
-        state.make_poa(asset, owner)
