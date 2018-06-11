@@ -90,25 +90,10 @@ $('[name="keySelect"]').on('change', function () {
 // Create Asset
 $('#createSubmit').on('click', function () {
   const asset = $('#createName').val()
-  if (asset) app.update('poe', asset)
-})
-
-// Transfer Asset
-$('#transferSubmit').on('click', function () {
-  const asset = $('[name="assetSelect"]').val()
-  const owner = $('[name="transferSelect"]').val()
-  if (asset && owner) app.update('transfer', asset, owner)
-})
-
-// Accept Asset
-$('#transferList').on('click', '.accept', function () {
-  const asset = $(this).prev().text()
-  if (asset) app.update('accept', asset)
-})
-
-$('#transferList').on('click', '.reject', function () {
-  const asset = $(this).prev().prev().text()
-  if (asset) app.update('reject', asset)
+  const action = $('[name="actionSelect"]').val()
+  console.log("action", action);
+  console.log("asset", asset);
+  if (asset) app.update(action, asset)
 })
 
 // Initialize
