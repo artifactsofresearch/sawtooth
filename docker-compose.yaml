@@ -113,6 +113,7 @@ services:
 #          --bind component:tcp://eth0:4004 \
 #          --bind network:tcp://eth0:8800
 #      "
+
   validator:
     image: hyperledger/sawtooth-validator:1.0
     container_name: sawtooth-validator
@@ -153,10 +154,10 @@ services:
         fi;
 
         sawtooth-validator -vv \
-          --endpoint tcp://validator:8800 \
+          --endpoint ${VALIDATOR_ENDPOINT} \
           --bind component:tcp://eth0:4004 \
           --bind network:tcp://eth0:8800 \
-          --peering dynamic \
+          --peering ${PEERING} \
           --network trust \
           --minimum-peer-connectivity  0
       "
@@ -164,6 +165,13 @@ services:
       PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
         /project/sawtooth-core/consensus/poet/simulator:\
         /project/sawtooth-core/consensus/poet/core "
+
+  identity-tp:
+    image: hyperledger/sawtooth-identity-tp:latest
+    container_name: identity-tp
+    expose:
+       - 4004
+    command: identity-tp -vv  -C tcp://validator:4004
 
   poet-validator-registry-tp:
     image: hyperledger/sawtooth-poet-validator-registry-tp:latest
