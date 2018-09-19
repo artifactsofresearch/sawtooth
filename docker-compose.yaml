@@ -76,14 +76,14 @@ services:
       "
 
   settings-tp:
-    image: hyperledger/sawtooth-settings-tp:1.0
+    image: hyperledger/sawtooth-settings-tp:1.0.5
     container_name: sawtooth-settings-tp
     depends_on:
       - validator
     entrypoint: settings-tp -vv -C tcp://validator:4004
 
   rest-api:
-    image: hyperledger/sawtooth-rest-api:1.0
+    image: hyperledger/sawtooth-rest-api:1.0.5
     container_name: sawtooth-rest-api
     expose:
       - 8008
@@ -115,7 +115,7 @@ services:
 #      "
 
   validator:
-    image: hyperledger/sawtooth-validator:1.0
+    image: hyperledger/sawtooth-validator:1.0.5
     container_name: sawtooth-validator
     expose:
       - 4004
