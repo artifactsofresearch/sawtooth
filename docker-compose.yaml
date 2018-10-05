@@ -41,20 +41,6 @@ services:
         tail -f /dev/null
       "
 
-  artifactchain-client:
-    build: ./client/
-    image: artifactchain-client
-    container_name: artifactchain-client
-    volumes:
-      - ./client/:/usr/local/apache2/htdocs/
-    expose:
-      - 80
-    ports:
-      - '8000:80'
-    depends_on:
-    - rest-api
-    - artifact-shell
-
   artifact-tp:
     build:
       context: .
@@ -93,27 +79,6 @@ services:
       - validator
     entrypoint: sawtooth-rest-api -vv -C tcp://validator:4004 --bind rest-api:8008
 
-#  validator:
-#    image: hyperledger/sawtooth-validator:1.0
-#    container_name: sawtooth-validator
-#    expose:
-#      - 4004
-#    ports:
-#      - '4004:4004'
-#    command: |
-#      bash -c "
-#        if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
-#          sawadm keygen
-#          sawtooth keygen my_key
-#          sawset genesis -k /root/.sawtooth/keys/my_key.priv
-#          sawadm genesis config-genesis.batch
-#        fi;
-#        sawtooth-validator -vv \
-#          --endpoint tcp://validator:8800 \
-#          --bind component:tcp://eth0:4004 \
-#          --bind network:tcp://eth0:8800
-#      "
-
   validator:
     image: hyperledger/sawtooth-validator:1.0.5
     container_name: sawtooth-validator
@@ -129,38 +94,16 @@ services:
           sawtooth keygen && \
           sawadm keygen \
 
-          sawset genesis \
-            -k /etc/sawtooth/keys/validator.priv \
-            -o config-genesis.batch && \
-          sawset proposal create \
-            -k /etc/sawtooth/keys/validator.priv \
-            -o config.batch \
-            sawtooth.consensus.algorithm=poet \
-            sawtooth.poet.report_public_key_pem=\"$$(cat /etc/sawtooth/simulator_rk_pub.pem)\" \
-            sawtooth.poet.valid_enclave_measurements=$$(poet enclave measurement) \
-            sawtooth.poet.valid_enclave_basenames=$$(poet enclave basename) \
-
-          poet registration create \
-            -k /etc/sawtooth/keys/validator.priv \
-            -o poet.batch && \
-          sawset proposal create \
-            -k /etc/sawtooth/keys/validator.priv \
-               sawtooth.poet.target_wait_time=5 \
-               sawtooth.poet.initial_wait_time=25 \
-               sawtooth.publisher.max_batches_per_block=100 \
-            -o poet-settings.batch && \
-
-          sawadm genesis config-genesis.batch config.batch poet.batch
         fi;
 
         sawtooth-validator -vv \
           --endpoint ${VALIDATOR_ENDPOINT} \
-          --bind component:tcp://eth0:4004 \
-          --bind network:tcp://eth0:8800 \
-          --peering ${PEERING} \
+          --bind component:${COMPONENT_IFACE} \
+          --bind network:${NETWORK_IFACE} \
           --network trust \
-          --minimum-peer-connectivity  0
+          --peers ${PEERS}
       "
+
     environment:
       PYTHONPATH: "/project/sawtooth-core/consensus/poet/common:\
         /project/sawtooth-core/consensus/poet/simulator:\
