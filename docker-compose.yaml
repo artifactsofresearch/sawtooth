@@ -43,7 +43,7 @@ services:
 
   artifactchain-client:
     build: ./client/
-    #image: sawtooth-tunachain-client
+    image: artifactchain-client
     container_name: artifactchain-client
     volumes:
       - ./client/:/usr/local/apache2/htdocs/
@@ -63,7 +63,7 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
-    #image: sawtooth-tunachain-tp
+    image: artifact-tp
     container_name: artifact-tp
     volumes:
       - '.:/project/sawtooth-artifact'
