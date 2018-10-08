@@ -66,7 +66,7 @@ NETWORK_IFACE=tcp://eth0:8800
 PEERS=tcp://bcnode.artifacts.ai:8800
 ```
 Set VALIDATOR_ENDPOINT to your external ip instead of 127.0.0.1
-  - Keep in mind that in case of NAT connection ports 4004 and 8800 must be forwarded to the target machine
+  - _NOTE: Keep in mind that in case of NAT connection ports 4004 and 8800 must be forwarded to the target machine_
 
 Build containers:
 ```
