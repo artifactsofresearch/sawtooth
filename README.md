@@ -120,7 +120,7 @@ root@host:~/artifacts/sawtooth# docker-compose exec validator cat /etc/sawtooth/
 038e883d98d698a********************f825629cc691bc7483994231f544bde
 ```
 
-As soon as Your node will be whitelisted on the network, it can get access to the blockchain.
+As soon as your node will be whitelisted on the network, it can get access to the blockchain.
 
 In case of successful join to the network you shall see in logs something like this:
 ```
@@ -155,7 +155,7 @@ root@host:~/SAWTOOTH/REPO/sawtooth# docker-compose down
 
   - docker-compose build --no-cache command fails
   
-  The most common reason is either docker daemon is not running or something wrong with docker images in the Hyperledger repo. In case of docker daemon you can use systemctl status docker.service to start it. In case of images You should wait for Hyperledger’s fixes
+  The most common reason is either docker daemon is not running or something wrong with docker images in the Hyperledger repo. In case of docker daemon you can use systemctl status docker.service to start it. In case of images you should wait for Hyperledger’s fixes
   - docker-compose up -d command fails
   
   There can be a lot of reasons. As a rule, the program will throw a message what causes an error. Common fix can be pulling the new code from git repo, building and running it again
@@ -163,5 +163,5 @@ root@host:~/SAWTOOTH/REPO/sawtooth# docker-compose down
 ```
 sawtooth-validator            | [2018-10-05 14:25:18.686 DEBUG    interconnect] Unable to complete Trust Authorization.
 ```
-  it means that Your validator’s key has not been added, so access to the node is restricted.
+  it means that your validator’s key has not been added, so access to the node is restricted.
   - For any other issues feel free to create an issue here: https://github.com/artifactsofresearch/sawtooth/issues 
