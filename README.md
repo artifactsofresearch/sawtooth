@@ -29,30 +29,30 @@ Please keep in mind that neither Hyperledger Sawtooth nor Artifacts provides any
 
 The Artifacts Sawtooth application code is stored on the github repository, so it requires git to be installed
 ```
-root@ip-172-31-89-171:~# apt-get -y install git
+root@host:~# apt-get -y install git
 ```
 Create project directory:
 ```
-root@ip-172-31-89-171:~# mkdir -p /root/artifacts/ && cd /root/artifacts/
+root@host:~# mkdir -p /root/artifacts/ && cd /root/artifacts/
 ```
 Clone repository:
 ```
-root@ip-172-31-89-171:~/artifacts# git clone https://github.com/artifactsofresearch/sawtooth.git
+root@host:~/artifacts# git clone https://github.com/artifactsofresearch/sawtooth.git
 ```
 Change directory:
 ```
-root@ip-172-31-89-171:~/artifacts# cd sawtooth/
+root@host:~/artifacts# cd sawtooth/
 ```
 
 # 3. Configure application:
 
 Copy default env variables config:
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# cp .env.dist .env
+root@host:~/artifacts/sawtooth# cp .env.dist .env
 ```
 Edit environment variables file and change corresponding values of variables
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# nano .env
+root@host:~/artifacts/sawtooth# nano .env
 ```
 The .env file must be like this:
 ```bash
@@ -63,14 +63,14 @@ COMPONENT_IFACE=tcp://eth0:4004
 #network bind
 NETWORK_IFACE=tcp://eth0:8800
 #peers list.  it is connection string to the master node
-PEERS=tcp://35.153.86.239:8800
+PEERS=tcp://bcnode.artifacts.ai:8800
 ```
 Set VALIDATOR_ENDPOINT to your external ip instead of 127.0.0.1
   - Keep in mind that in case of NAT connection ports 4004 and 8800 must be forwarded to the target machine
 
 Build containers:
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose build --no-cache
+root@host:~/artifacts/sawtooth# docker-compose build --no-cache
 ```
 You should not see any errors during building process
 
@@ -78,11 +78,11 @@ You should not see any errors during building process
 
   - Start and run all Artifacts Sawtooth application stack
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose up -d
+root@host:~/artifacts/sawtooth# docker-compose up -d
 ```
   - See list of runned containers (all containers must be in Up state as in the example below):
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose ps
+root@host:~/artifacts/sawtooth# docker-compose ps
 ```
 ```
        Name             Command                         State           Ports                     
@@ -103,18 +103,18 @@ sawtooth-validator      bash -c                          Up      0.0.0.0:4004->4
 
   - See validator’s logs in real time:
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose logs validator -f
+root@host:~/artifacts/sawtooth# docker-compose logs validator -f
 ```
   - See full stack logs in real time:
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose logs -f
+root@host:~/artifacts/sawtooth# docker-compose logs -f
 ```
 
 The network policies bases on validator keys. In order to get node connected to the network, you need to send validator’s PUBLIC key to the ARTiFACTS Support Team:
 
   - To get your validator’s public key run next command and copy the output (example key see below):
 ```
-root@ip-172-31-89-171:~/artifacts/sawtooth# docker-compose exec validator cat /etc/sawtooth/keys/validator.pub
+root@host:~/artifacts/sawtooth# docker-compose exec validator cat /etc/sawtooth/keys/validator.pub
 ```
 ```
 038e883d98d698a********************f825629cc691bc7483994231f544bde
@@ -127,7 +127,7 @@ In case of successful join to the network you shall see in logs something like t
 sawtooth-validator            | [2018-10-05 14:34:39.267 DEBUG    gossip] Connection to aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075 succeeded
 sawtooth-validator            | [2018-10-05 14:34:39.267 DEBUG    handlers] Connection: aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075 is approved
 sawtooth-validator            | [2018-10-05 14:34:39.271 DEBUG    gossip] Peering request to aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075 was successful
-sawtooth-validator            | [2018-10-05 14:34:39.271 DEBUG    gossip] Added connection_id aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075 with endpoint tcp://35.153.86.239:8800, connected identities are now {'aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075': 'tcp://35.153.86.239:8800'}
+sawtooth-validator            | [2018-10-05 14:34:39.271 DEBUG    gossip] Added connection_id aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075 with endpoint tcp://bcnode.artifacts.ai:8800, connected identities are now {'aa2c914b37624067ea3001e2f4802bb6d2d6500d649b660319917e7fb5ea981be98e4328743a1926af834ddfa13765d3b3a535d78ca53e13fd903d434953b075': 'tcp://bcnode.artifacts.ai:8800'}
 ```
 
   - Also you can check network batches by connecting to the REST-API using this URL:
@@ -140,15 +140,15 @@ You will see JSON formatted info about batches, transactions etc.
 
 Stop ARTiFACTS Sawtooth stack:
 ```
-root@ip-172-31-80-173:~/SAWTOOTH/REPO/sawtooth# docker-compose stop
+root@host:~/SAWTOOTH/REPO/sawtooth# docker-compose stop
 ```
 Start ARTiFACTS Sawtooth stack:
 ```
-root@ip-172-31-80-173:~/SAWTOOTH/REPO/sawtooth# docker-compose start
+root@host:~/SAWTOOTH/REPO/sawtooth# docker-compose start
 ```
 Remove containers:
 ```
-root@ip-172-31-80-173:~/SAWTOOTH/REPO/sawtooth# docker-compose down
+root@host:~/SAWTOOTH/REPO/sawtooth# docker-compose down
 ```
 
 ## Troubleshooting
