@@ -44,7 +44,7 @@ Change directory:
 root@host:~/artifacts# cd sawtooth/
 ```
 
-# 3. Configure application:
+# 3. Configure Sawtooth application:
 
 Copy default env variables config:
 ```
@@ -74,7 +74,12 @@ root@host:~/artifacts/sawtooth# docker-compose build --no-cache
 ```
 You should not see any errors during building process
 
-# 4. Sawtooth application launch
+# 4. Configure Sawtooth Explorer
+
+Edit ```explorer/src/environments/environment.ts``` file and specify Your domain or IP address in the ```apiURL``` variable instead of ```localhost``` in the string
+```  apiURL: 'http://localhost:8090',```
+ 
+# 5. Sawtooth application launch
 
   - Start and run all Artifacts Sawtooth application stack
 ```
