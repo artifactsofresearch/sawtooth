@@ -67,6 +67,7 @@ PEERS=tcp://bcnode.artifacts.ai:8800
 ```
 Set VALIDATOR_ENDPOINT to your external ip instead of 127.0.0.1
   - _NOTE: Keep in mind that in case of NAT connection ports 4004 and 8800 must be forwarded to the target machine_
+  - _NOTE: To get correct PEERS settings please contact support@artifacts.ai_
 
 Build containers:
 ```
@@ -115,7 +116,7 @@ root@host:~/artifacts/sawtooth# docker-compose logs validator -f
 root@host:~/artifacts/sawtooth# docker-compose logs -f
 ```
 
-The network policies bases on validator keys. In order to get node connected to the network, you need to send validator’s PUBLIC key to the ARTiFACTS Support Team:
+The network policies bases on validator keys. In order to get node connected to the network, you need to send validator’s PUBLIC key to the ARTiFACTS Support Team support@artifacts.ai:
 
   - To get your validator’s public key run next command and copy the output (example key see below):
 ```
